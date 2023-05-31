@@ -45,5 +45,16 @@ describe Application do
             expect(response.body).to eq(expected_response)
           end
         end
+
+        context 'POST /artists' do
+          it 'should create a new artist' do
+            response = post(
+              '/artists', name: 'Wild nothing',
+              genre: 'Indie'
+            )
+            expect(response.status).to eq(200)
+            expect(response.body).to eq('') 
+          end
+        end
 end
 

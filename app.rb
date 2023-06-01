@@ -15,32 +15,55 @@ class Application < Sinatra::Base
           also_reload 'lib/artist_repository'
         end
 
+
+        # get '/' do
+        #   return erb(:index)
+        # end
+
+        # get '/about' do
+        #   return erb(:about)
+        # end
+
         get '/' do
           @password = params[:password]
           #@cohort_name = 'May 2023'
           return erb(:index)
         end
 
-      
-        get '/albums' do
-          repo = AlbumRepository.new
-          albums = repo.all
-          response = albums.map do |album|
-          album.title
-          end.join(', ')
-          return response
-        end
 
         get '/albums/:id' do
           repo = AlbumRepository.new
           artist_repo = ArtistRepository.new
 
-          #p params[:id]
-
           @album = repo.find(params[:id])
           @artist = artist_repo.find(@album.artist_id)
-          return erb(:album)
+       
+          return erb :album
         end
+
+        get '/artists/:id' do
+          artist_repo = ArtistRepository.new
+
+
+          #p params[:id]
+
+          @artist = artist_repo.find(params[:id])
+          return erb(:artist)  
+        end
+
+
+        get '/albums' do
+          repo = AlbumRepository.new
+          @result = repo.all
+          return erb :albums
+        end
+
+
+        # get '/albums' do
+        #   repo = AlbumRepository.new
+        #   @albums = repo.all
+        #   return erb(:album)
+        # end
 
         post '/albums' do
           repo = AlbumRepository.new
@@ -55,11 +78,8 @@ class Application < Sinatra::Base
 
         get '/artists' do
           repo = ArtistRepository.new
-          artist = repo.all
-          response = artist.map do |artist|
-          artist.name
-          end.join(', ')
-          return response
+          @result = repo.all
+          return erb(:artists)
         end
 
         post '/artists' do

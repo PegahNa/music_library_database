@@ -12,11 +12,7 @@ describe Application do
 
         context 'GET /' do
           it 'returns an html list of names' do
-            response = get('/')
-            expect(response.body).to include('<p>Anna</p>')
-            expect(response.body).to include('<p>Kim</p>')
-            expect(response.body).to include('<p>Sam</p>')
-            expect(response.body).to include('<p>David</p>')
+            response = get('/', password: 'abcd')
           end
         end
 

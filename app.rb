@@ -15,7 +15,7 @@ class Application < Sinatra::Base
         end
 
         get '/' do
-          @names = ['Anna', 'Kim', 'Sam', 'David']
+          @password = params[:password]
           #@cohort_name = 'May 2023'
           return erb(:index)
         end

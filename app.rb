@@ -5,6 +5,7 @@ require_relative 'lib/database_connection'
 require_relative 'lib/album_repository'
 require_relative 'lib/artist_repository'
 
+
 DatabaseConnection.connect
 
 class Application < Sinatra::Base
@@ -28,6 +29,17 @@ class Application < Sinatra::Base
           album.title
           end.join(', ')
           return response
+        end
+
+        get '/albums/:id' do
+          repo = AlbumRepository.new
+          artist_repo = ArtistRepository.new
+
+          #p params[:id]
+
+          @album = repo.find(params[:id])
+          @artist = artist_repo.find(@album.artist_id)
+          return erb(:album)
         end
 
         post '/albums' do

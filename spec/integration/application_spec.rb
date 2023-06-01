@@ -11,18 +11,15 @@ describe Application do
         let(:app) { Application.new }
 
         context 'GET /' do
-          it 'returns to html hello message with the give name' do
-          response = get('/', name: 'pegah')
-          expect(response.body).to include('<h1>Hello pegah!</h1>')
-
+          it 'returns an html list of names' do
+            response = get('/')
+            expect(response.body).to include('<p>Anna</p>')
+            expect(response.body).to include('<p>Kim</p>')
+            expect(response.body).to include('<p>Sam</p>')
+            expect(response.body).to include('<p>David</p>')
+          end
         end
 
-        it 'returns an html hello message with a different name' do
-          response = get('/', name: 'Clara')
-          expect(response.body).to include('<h1>Hello Clara!</h1>')
-        end
-
-      end
 
         context 'GET /albums' do
           it 'should return the list of albums' do

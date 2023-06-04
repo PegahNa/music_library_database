@@ -2,12 +2,8 @@ require "spec_helper"
 require "rack/test"
 require_relative '../../app'
 
-describe Application do
-        # This is so we can use rack-test helper methods.
+describe Application d0
         include Rack::Test::Methods
-
-        # We need to declare the `app` value by instantiating the Application
-        # class so our tests work.
         let(:app) { Application.new }
 
         def reset_albums_table
@@ -21,88 +17,106 @@ describe Application do
           reset_albums_table
         end
 
-        context 'GET /' do
-          it 'returns an html list of names' do
-            response = get('/', password: 'abcd')
-          end
-        end
 
-        context 'GET /albums/:id' do
-          it 'should return info about album 1' do
-            response = get('/albums/2')
-            expect(response.status).to eq(200)
-            expect(response.body).to include('<h1>Surfer Rosa</h1>')
-            expect(response.body).to include('Release year: 1988')
-            expect(response.body).to include('Artist: Pixies')
-            end
-        end
+        context "/albums" do
+    it 'returns 200 OK with post method' do
+      post '/albums', { title: 'Voyage', release_year: 2022, artist_id: 2 }
 
-        context 'GET /artists/:id' do
-          it 'returns an HTML page showing details for a single artist' do
-            response = get('/artists')
-            expect(response.status).to eq(200)
-            expect(response.body).to include('<h1>Artist</h1>')
-            expect(response.body).to include('<div>name: Pixies, genre: Rock</div>')
-            expect(response.body).to include('<div>name: ABBA, genre: Pop</div>')
-          end
-        end
+      expect(last_response.status).to eq(200)
 
+      album = AlbumRepository.new.all
+      expect(album.last.title).to eq("Voyage")
+    end 
 
-        context 'GET /albums' do
-          it 'returns the list of albums as an HTML page' do
-            response = get('/albums')
+    it 'returns 200 OK and albums data' do
+      response = get('/albums')
 
-            expected_body = response.body.gsub("\n", '').squeeze(' ')
-            expect(response.status).to eq(200)
-            expect(response.body).to include('<h1> Albums </h1>')
-            expect(expected_body).to include('<a href="/albums/12"> Title: Ring Ring Release year: 1973 </a>')
-          end
-        end
+      expect(response.status).to eq(200)
+      response_body = response.body.gsub("\n", '').squeeze(' ')
+      expect(response_body).to include('<a href="/albums/1"> -- Title: Doolittle -- Released: 1989 </a>')
+    end  
+  end
 
-            context 'POST /albums' do
-              it 'should create a new album' do
-                response = post(
-                  '/albums', title: 'OK Computer',
-                  release_year: '1997',
-                    artist_id: '1'
-                  )
-                expect(response.status).to eq(200)
-                expect(response.body).to eq('') 
-            
+  
+  context "GET /albums/id" do
+    it "returns an album data" do
+      response = get('/albums/1')
+  
+      expect(response.status).to eq(200)
+      expect(response.body).to include('<h1>Doolittle</h1>')
+    end
+  end
 
-            response = get('/albums')
+  context "GET /artists/id" do
+    it "returns an album data" do
+      response = get('/artists/1')
+  
+      expect(response.status).to eq(200)
+      expect(response.body).to include('<h1>Pixies</h1>')
+    end
+  end
 
-            expect(response.body).to include('OK Computer')
-          end
-        end
+  context "GET /albums/new" do
+    it 'returns the form page' do
+      response = get('/albums/new')
+  
+      expect(response.status).to eq(200)
+      expect(response.body).to include('<h1>New Album</h1>')
+  
+      expect(response.body).to include('<form action="/albums" method="post">')
+  
+    
+    end
+  end
+  
+  context "POST /albums" do
+    it 'returns a success page' do
+     
+      response = post '/albums', { title: 'Im Title', release_year: 2000, artist_id: 1 }
+  
+      expect(response.status).to eq(200)
+      expect(response.body).to include('<p>The album has been successfully created.</p>')
+    end
+  
+    it 'responds with 400 status if parameters are invalid' do
+      post '/albums', {
+        title: '',
+        release_year: '1990',
+        artist_id: '1'
+      }
+    
+      expect(last_response.status).to eq(400)
+    end
+  end
 
-        context 'GET /artists' do
-          it 'should return the list of artists' do
-            response = get('/artists')
-            expected_response = 'Pixies, ABBA, Taylor Swift, Nina Simone, Kiasmos'
-            expect(response.status).to eq(200)
-            expect(response.body).to eq(expected_response)
-          end
-        end
-
-        context 'POST /artists' do
-          it 'should create a new artist' do
-            response = post(
-              '/artists', name: 'Wild nothing',
-              genre: 'Indie'
-            )
-            expect(response.status).to eq(200)
-            expect(response.body).to eq('') 
-          end
-        end
-
-        context 'GET /artists' do
-          it 'should return the list of artists' do
-            response = get('/artists')
-            expected_response = 'Pixies, ABBA, Taylor Swift, Nina Simone, Kiasmos, Wild nothing'
-            expect(response.status).to eq(200)
-            expect(response.body).to eq(expected_response)
-          end
-        end
+  context "GET /artists/new" do
+    it 'returns the form page' do
+      response = get('/artists/new')
+  
+      expect(response.status).to eq(200)
+      expect(response.body).to include('<h1>New Artist</h1>')
+  
+      expect(response.body).to include('<form action="/artists" method="post">')
+  
+    end
+  end
+  
+  context "POST /artists" do
+    it 'returns a success page' do
+     
+      response = post '/artists', { name: 'Wild nothing', genre: 'Indie' }
+  
+      expect(response.status).to eq(200)
+      expect(response.body).to include('<p>New artist has been successfully created.</p>')
+    end
+  
+    it 'responds with 400 status if parameters are invalid' do
+      post '/artists', {
+        name: '',
+        genre: 'Pop'
+      }
+    
+      expect(last_response.status).to eq(400)
+    end
+  end
 end
-
